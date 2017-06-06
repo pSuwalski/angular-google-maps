@@ -117,8 +117,6 @@ export class AgmMarker implements OnDestroy, OnChanges, AfterContentInit {
    * This event is fired when the user mouses outside the marker.
    */
   @Output() mouseOut: EventEmitter<MouseEvent> = new EventEmitter<MouseEvent>();
-
-
   /**
    * @internal
    */
