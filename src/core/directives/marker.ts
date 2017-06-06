@@ -1,13 +1,14 @@
-import {Directive, EventEmitter, OnChanges, OnDestroy, SimpleChange,
+import {
+  Directive, EventEmitter, OnChanges, OnDestroy, SimpleChange,
   AfterContentInit, ContentChildren, QueryList, Input, Output
 } from '@angular/core';
-import {Subscription} from 'rxjs/Subscription';
+import { Subscription } from 'rxjs/Subscription';
 
-import {MouseEvent} from '../map-types';
+import { MouseEvent } from '../map-types';
 import * as mapTypes from '../services/google-maps-types';
-import {MarkerManager} from '../services/managers/marker-manager';
+import { MarkerManager } from '../services/managers/marker-manager';
 
-import {AgmInfoWindow} from './info-window';
+import { AgmInfoWindow } from './info-window';
 
 let markerId = 0;
 
@@ -92,6 +93,11 @@ export class AgmMarker implements OnDestroy, OnChanges, AfterContentInit {
    */
   @Input() zIndex: number = 1;
 
+  @Input() iconAnchorX: number = 14;
+  @Input() iconAnchorY: number = 14;
+  @Input() iconScaledSizeWidth: number = 28;
+  @Input() iconScaledSizeHeight: number = 28;
+
   /**
    * This event emitter gets emitted when the user clicks on the marker.
    */
@@ -111,6 +117,7 @@ export class AgmMarker implements OnDestroy, OnChanges, AfterContentInit {
    * This event is fired when the user mouses outside the marker.
    */
   @Output() mouseOut: EventEmitter<MouseEvent> = new EventEmitter<MouseEvent>();
+
 
   /**
    * @internal
@@ -139,7 +146,7 @@ export class AgmMarker implements OnDestroy, OnChanges, AfterContentInit {
   }
 
   /** @internal */
-  ngOnChanges(changes: {[key: string]: SimpleChange}) {
+  ngOnChanges(changes: { [key: string]: SimpleChange }) {
     if (typeof this.latitude !== 'number' || typeof this.longitude !== 'number') {
       return;
     }
@@ -185,29 +192,43 @@ export class AgmMarker implements OnDestroy, OnChanges, AfterContentInit {
     this._observableSubscriptions.push(cs);
 
     const ds =
-        this._markerManager.createEventObservable<mapTypes.MouseEvent>('dragend', this)
-            .subscribe((e: mapTypes.MouseEvent) => {
-              this.dragEnd.emit(<MouseEvent>{coords: {lat: e.latLng.lat(), lng: e.latLng.lng()}});
-            });
+      this._markerManager.createEventObservable<mapTypes.MouseEvent>('dragend', this)
+        .subscribe((e: mapTypes.MouseEvent) => {
+          this.dragEnd.emit(<MouseEvent>{ coords: { lat: e.latLng.lat(), lng: e.latLng.lng() } });
+        });
     this._observableSubscriptions.push(ds);
 
     const mover =
-        this._markerManager.createEventObservable<mapTypes.MouseEvent>('mouseover', this)
-            .subscribe((e: mapTypes.MouseEvent) => {
-              this.mouseOver.emit(<MouseEvent>{coords: {lat: e.latLng.lat(), lng: e.latLng.lng()}});
-            });
+      this._markerManager.createEventObservable<mapTypes.MouseEvent>('mouseover', this)
+        .subscribe((e: mapTypes.MouseEvent) => {
+          this.mouseOver.emit(<MouseEvent>{ coords: { lat: e.latLng.lat(), lng: e.latLng.lng() } });
+        });
     this._observableSubscriptions.push(mover);
 
     const mout =
-        this._markerManager.createEventObservable<mapTypes.MouseEvent>('mouseout', this)
-            .subscribe((e: mapTypes.MouseEvent) => {
-              this.mouseOut.emit(<MouseEvent>{coords: {lat: e.latLng.lat(), lng: e.latLng.lng()}});
-            });
+      this._markerManager.createEventObservable<mapTypes.MouseEvent>('mouseout', this)
+        .subscribe((e: mapTypes.MouseEvent) => {
+          this.mouseOut.emit(<MouseEvent>{ coords: { lat: e.latLng.lat(), lng: e.latLng.lng() } });
+        });
     this._observableSubscriptions.push(mout);
   }
 
   /** @internal */
   id(): string { return this._id; }
+
+  getIcon() {
+    const icon: any = {};
+    if (this.iconUrl) {
+      icon.url = this.iconUrl;
+    }
+    if (this.iconAnchorX && this.iconAnchorY) {
+      icon.anchor = { x: this.iconAnchorX, y: this.iconAnchorY };
+    }
+    if (this.iconScaledSizeWidth && this.iconScaledSizeHeight) {
+      icon.scaledSize = { width: this.iconScaledSizeWidth, height: this.iconScaledSizeHeight };
+    }
+    return icon;
+  }
 
   /** @internal */
   toString(): string { return 'AgmMarker-' + this._id.toString(); }
