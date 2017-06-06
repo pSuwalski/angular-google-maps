@@ -66,7 +66,7 @@ export class MarkerManager {
       position: {lat: marker.latitude, lng: marker.longitude},
       label: marker.label,
       draggable: marker.draggable,
-      icon: marker.iconUrl,
+      icon: marker.getIcon(),
       opacity: marker.opacity,
       visible: marker.visible,
       zIndex: marker.zIndex,
